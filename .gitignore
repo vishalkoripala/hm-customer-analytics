@@ -1,0 +1,21 @@
+# Python environment and cache
+venv/
+__pycache__/
+*.py[cod]
+
+# Intermediate and original large datasets
+data/*
+!data/*.gz
+
+# Dashboard temporary files
+dashboard/__pycache__/
+dashboard/data/*_raw.csv
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+
+# Generated Java files and Mahout intermediates
+*.class
+vectors/
