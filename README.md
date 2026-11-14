@@ -305,3 +305,19 @@ Anil Neerukonda Institute of Technology & Sciences
 This repository contains project source code and derived analytical outputs.
 
 The original dataset is provided by H&M through the Kaggle competition. Users should obtain the dataset directly from Kaggle and follow its competition rules and applicable terms.
+
+## Dashboard Screenshots
+
+### Dataset Overview
+![Dataset Overview](screenshots/dataset-overview.png)
+
+### Customer Segmentation
+![Customer Segmentation](screenshots/customer-segmentation.png)
+
+### RFM Analysis
+![RFM Analysis 1](screenshots/rfm-analysis-1.png)
+![RFM Analysis 2](screenshots/rfm-analysis-2.png)
+
+### Sales and Transaction Analytics
+![Sales Analytics 1](screenshots/sales-analytics-1.png)
+![Sales Analytics 2](screenshots/sales-analytics-2.png)
