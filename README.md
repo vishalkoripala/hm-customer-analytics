@@ -306,18 +306,70 @@ This repository contains project source code and derived analytical outputs.
 
 The original dataset is provided by H&M through the Kaggle competition. Users should obtain the dataset directly from Kaggle and follow its competition rules and applicable terms.
 
-## Dashboard Screenshots
+## Implementation Screenshots
 
-### Dataset Overview
-![Dataset Overview](screenshots/dataset-overview.png)
+The following screenshots provide evidence of the practical implementation of Hadoop, HDFS, Apache Hive, and the project dashboard.
 
-### Customer Segmentation
-![Customer Segmentation](screenshots/customer-segmentation.png)
+### 1. Hadoop and YARN
 
-### RFM Analysis
-![RFM Analysis 1](screenshots/rfm-analysis-1.png)
-![RFM Analysis 2](screenshots/rfm-analysis-2.png)
+**Hadoop Services**
+![Hadoop Services](screenshots/hadoop/hadoop-services.png)
 
-### Sales and Transaction Analytics
-![Sales Analytics 1](screenshots/sales-analytics-1.png)
-![Sales Analytics 2](screenshots/sales-analytics-2.png)
+**YARN Node Status**
+![YARN Node Status](screenshots/hadoop/yarn-node-status.png)
+
+**YARN Job History**
+![Job History](screenshots/hadoop/job-history.png)
+
+### 2. HDFS – Distributed Storage
+
+**HDFS Directory Structure**
+![HDFS Directory Structure](screenshots/hdfs/hdfs-directory-structure.png)
+
+**Dataset Storage**
+![HDFS Dataset Storage](screenshots/hdfs/hdfs-dataset-storage.png)
+
+**HDFS Storage Usage**
+![HDFS Storage Usage](screenshots/hdfs/hdfs-storage-usage.png)
+
+**Reading Dataset from HDFS**
+![HDFS Data Read](screenshots/hdfs/hdfs-data-read.png)
+
+**HDFS Block Verification**
+![HDFS Block Verification](screenshots/hdfs/hdfs-block-verification.png)
+
+### 3. Apache Hive – Data Analytics
+
+**Transaction Data Preview**
+![Hive Transaction Preview](screenshots/hive/hive-transaction-data-preview.png)
+
+**Monthly Transaction Analysis**
+![Monthly Transaction Analysis](screenshots/hive/hive-monthly-transaction-analysis.png)
+
+**Sales Channel Distribution**
+![Sales Channel Distribution](screenshots/hive/hive-sales-channel-distribution.png)
+
+**Product Category Analysis**
+![Product Category Analysis](screenshots/hive/hive-product-category-analysis.png)
+
+**Customer Age-Group Analysis**
+![Customer Age Analysis](screenshots/hive/hive-customer-age-analysis.png)
+
+**Top-Selling Articles**
+![Top Selling Articles](screenshots/hive/hive-top-selling-articles.png)
+
+### 4. Interactive Dashboard
+
+**Dataset Overview**
+![Dataset Overview](screenshots/dashboard/dataset-overview.png)
+
+**Customer Segmentation**
+![Customer Segmentation](screenshots/dashboard/customer-segmentation.png)
+
+**RFM Analysis**
+![RFM Analysis 1](screenshots/dashboard/rfm-analysis-1.png)
+![RFM Analysis 2](screenshots/dashboard/rfm-analysis-2.png)
+
+**Sales and Transaction Analytics**
+![Sales Analytics 1](screenshots/dashboard/sales-analytics-1.png)
+![Sales Analytics 2](screenshots/dashboard/sales-analytics-2.png)
