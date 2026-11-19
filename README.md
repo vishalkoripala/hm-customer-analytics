@@ -321,7 +321,7 @@ The repository includes the analytical CSV files and compressed customer-level d
 
 ### Prerequisites
 
-- Python 3.10 or later
+- Python 3.11 or later
 - pip
 - Git
 
