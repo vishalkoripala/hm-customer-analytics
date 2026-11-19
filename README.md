@@ -358,7 +358,19 @@ The following screenshots provide evidence of the practical implementation of Ha
 **Top-Selling Articles**
 ![Top Selling Articles](screenshots/hive/hive-top-selling-articles.png)
 
-### 4. Interactive Dashboard
+### 4. RFM Feature Engineering
+
+**RFM Preprocessing, Statistical Summary and Feature Scaling**
+
+![RFM Preprocessing and Scaling](screenshots/rfm/rfm-preprocessing-and-scaling.png)
+
+### 5. Apache Mahout – K-Means Clustering
+
+**K-Means Cluster Distribution and Customer Mapping Validation**
+
+![Mahout K-Means Clustering and Validation](screenshots/mahout/mahout-kmeans-clustering-validation.png)
+
+### 6. Interactive Dashboard
 
 **Dataset Overview**
 ![Dataset Overview](screenshots/dashboard/dataset-overview.png)
