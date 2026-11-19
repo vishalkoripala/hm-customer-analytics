@@ -1,72 +1,181 @@
+import argparse
 import csv
 from collections import Counter
+from pathlib import Path
 
-BASE = "/home/vishalkoripala/hm_clustering/data"
 
-scaled_file = f"{BASE}/customer_rfm_scaled.tsv"
-cluster_file = f"{BASE}/extracted_clusters.tsv"
-output_file = f"{BASE}/customer_clusters_final.csv"
+PROJECT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = PROJECT_DIR / "data"
+
 
 def vector_key(values):
-    return tuple(f"{float(x):.10f}" for x in values)
+    return tuple(f"{float(value):.10f}" for value in values)
 
-# Build vector-to-cluster lookup
-vector_to_cluster = {}
 
-with open(cluster_file) as f:
-    for line in f:
-        cluster, r, freq, monetary = line.strip().split("\t")
-        key = vector_key((r, freq, monetary))
+def load_cluster_assignments(cluster_file):
+    vector_to_cluster = {}
 
-        if key in vector_to_cluster and vector_to_cluster[key] != cluster:
-            raise ValueError(f"Conflicting cluster assignment: {key}")
+    with cluster_file.open(encoding="utf-8") as file:
+        for line_number, line in enumerate(file, start=1):
+            fields = line.rstrip("\r\n").split("\t")
 
-        vector_to_cluster[key] = cluster
+            if len(fields) != 4:
+                raise ValueError(
+                    f"Invalid cluster record at line {line_number}: "
+                    "expected 4 tab-separated fields."
+                )
 
-print("Unique vector mappings:", len(vector_to_cluster))
+            cluster, recency, frequency, monetary = fields
 
-matched = 0
-unmatched = 0
-cluster_counts = Counter()
+            try:
+                key = vector_key((recency, frequency, monetary))
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid vector values at cluster line {line_number}"
+                ) from exc
 
-with open(scaled_file, newline="") as source, \
-     open(output_file, "w", newline="") as destination:
+            if key in vector_to_cluster:
+                if vector_to_cluster[key] != cluster:
+                    raise ValueError(
+                        f"Conflicting cluster assignments for vector: {key}"
+                    )
+                continue
 
-    reader = csv.reader(source, delimiter="\t")
-    writer = csv.writer(destination)
+            vector_to_cluster[key] = cluster
 
-    header = next(reader)
-    writer.writerow(["customer_id", "cluster_id"])
+    if not vector_to_cluster:
+        raise ValueError("No cluster assignments were found.")
 
-    for row in reader:
-        if len(row) < 4:
-            continue
+    return vector_to_cluster
 
-        customer_id = row[0]
-        key = vector_key(row[1:4])
 
-        cluster = vector_to_cluster.get(key)
+def main():
+    parser = argparse.ArgumentParser(
+        description="Map customer IDs to Mahout cluster assignments."
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=Path,
+        default=DEFAULT_DATA_DIR,
+        help="Directory containing the intermediate data files."
+    )
+    parser.add_argument(
+        "--expected-count",
+        type=int,
+        default=1_362_281,
+        help="Expected number of customers (default: 1362281)."
+    )
+    args = parser.parse_args()
 
-        if cluster is None:
-            unmatched += 1
-            continue
+    data_dir = args.data_dir.expanduser()
+    scaled_file = data_dir / "customer_rfm_scaled.tsv"
+    cluster_file = data_dir / "extracted_clusters.tsv"
+    output_file = data_dir / "customer_clusters_final.csv"
 
-        writer.writerow([customer_id, cluster])
-        cluster_counts[cluster] += 1
-        matched += 1
+    for path in (scaled_file, cluster_file):
+        if not path.is_file():
+            raise FileNotFoundError(f"Required file not found: {path}")
 
-print("\nMapping results")
-print("Matched customers:", matched)
-print("Unmatched customers:", unmatched)
-print("Cluster distribution:")
+    if args.expected_count < 1:
+        raise ValueError("Expected customer count must be positive.")
 
-for cluster, count in sorted(cluster_counts.items()):
-    print(cluster, count)
+    # Build vector-to-cluster lookup.
+    vector_to_cluster = load_cluster_assignments(cluster_file)
 
-print("Total mapped:", sum(cluster_counts.values()))
-print("Output:", output_file)
+    print("Unique vector mappings:", len(vector_to_cluster))
 
-if matched != 1362281 or unmatched != 0:
-    raise SystemExit("VALIDATION FAILED")
+    matched = 0
+    unmatched = 0
+    cluster_counts = Counter()
+    seen_customer_ids = set()
 
-print("\nSUCCESS: All customer IDs mapped and validated.")
+    with scaled_file.open(
+        newline="", encoding="utf-8"
+    ) as source, output_file.open(
+        "w", newline="", encoding="utf-8"
+    ) as destination:
+
+        reader = csv.reader(source, delimiter="\t")
+        writer = csv.writer(destination)
+
+        header = next(reader, None)
+
+        expected_header = [
+            "customer_id", "recency", "frequency", "monetary"
+        ]
+
+        if header != expected_header:
+            raise ValueError(
+                f"Unexpected input header: {header}. "
+                f"Expected: {expected_header}"
+            )
+
+        writer.writerow(["customer_id", "cluster_id"])
+
+        for line_number, row in enumerate(reader, start=2):
+            if len(row) != 4:
+                raise ValueError(
+                    f"Invalid customer record at line {line_number}: "
+                    "expected 4 tab-separated fields."
+                )
+
+            customer_id = row[0].strip()
+
+            if not customer_id:
+                raise ValueError(
+                    f"Empty customer ID at line {line_number}"
+                )
+
+            if customer_id in seen_customer_ids:
+                raise ValueError(
+                    f"Duplicate customer ID at line {line_number}: "
+                    f"{customer_id}"
+                )
+
+            seen_customer_ids.add(customer_id)
+
+            try:
+                key = vector_key(row[1:4])
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid RFM vector at line {line_number}"
+                ) from exc
+
+            cluster = vector_to_cluster.get(key)
+
+            if cluster is None:
+                unmatched += 1
+                continue
+
+            writer.writerow([customer_id, cluster])
+            cluster_counts[cluster] += 1
+            matched += 1
+
+    print("\nMapping results")
+    print("Matched customers:", matched)
+    print("Unmatched customers:", unmatched)
+    print("Unique customer IDs:", len(seen_customer_ids))
+    print("Cluster distribution:")
+
+    for cluster, count in sorted(cluster_counts.items()):
+        print(cluster, count)
+
+    print("Total mapped:", sum(cluster_counts.values()))
+    print("Output:", output_file)
+
+    if matched != args.expected_count:
+        raise SystemExit(
+            f"VALIDATION FAILED: expected {args.expected_count} "
+            f"mappings, found {matched}."
+        )
+
+    if unmatched != 0:
+        raise SystemExit(
+            f"VALIDATION FAILED: {unmatched} customers were unmatched."
+        )
+
+    print("\nSUCCESS: All customer IDs mapped and validated.")
+
+
+if __name__ == "__main__":
+    main()

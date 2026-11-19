@@ -13,10 +13,11 @@ st.set_page_config(
     layout="wide"
 )
 
-DATA_DIR = Path.home() / "hm_clustering" / "data"
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_DIR / "data"
 
-RFM_FILE = DATA_DIR / "customer_rfm.tsv"
-CLUSTER_FILE = DATA_DIR / "customer_clusters_final.csv"
+RFM_FILE = DATA_DIR / "customer_rfm.tsv.gz"
+CLUSTER_FILE = DATA_DIR / "customer_clusters_final.csv.gz"
 
 CLUSTER_NAMES = {
     737932: "High-Value Frequent Customers",
